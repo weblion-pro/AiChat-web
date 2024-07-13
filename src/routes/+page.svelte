@@ -25,7 +25,6 @@
 	</div>
 	<h2 class="h2 font-semibold">Hello, <b>{($page.data.username)}</b></h2>
 	<h2 class="h2 font-semibold">Hello, <b>{$page.data.firstName ?? "Not Set"}</b></h2>
-	<h2 class="h2 font-semibold">Hello, <b>{$page.data.secretVar ?? "Not Set"}</b></h2>
 	
 	{#if ($page.data.username)}
 		<form class="flex flex-col gap-4 p-4 w-1/4 " method="POST" use:enhance>

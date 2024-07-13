@@ -13,28 +13,18 @@
 </script>
 
 <main class="flex h-lvh justify-center items-center">
-	<div class="card w-[40%] p-10" >
-		<div class="mt-6 grid grid-cols-3 gap-3">
-			<div>
-				<a href="#"
-					class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-					<img class="h-6 w-6" src="https://www.svgrepo.com/show/512120/facebook-176.svg"
-						alt="">
-				</a>
-			</div>
-			<div>
-				<a href="/login/google"
-					class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-					<img class="h-6 w-6" src="https://www.svgrepo.com/show/506498/google.svg" alt="">
-				</a>
-			</div>
-			<div>
-				<a href="#"
-					class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-					<img class="h-6 w-6" src="https://www.svgrepo.com/show/513008/twitter-154.svg"
-						alt="">
-				</a>
-			</div>
+	<div class="flex flex-col card w-[40%] p-10 gap-5" >
+		<div class="flex justify-center items-center">
+			<a href="/login/google"
+				class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+				<img class="h-6 w-6" src="https://www.svgrepo.com/show/506498/google.svg" alt="">
+				<span class=" text-lg font-semibold ml-4">Sign in with Google</span>
+			</a>
+		</div>
+		<div class="flex justify-between items-center">
+			<hr class="my-5 w-1/3 border-gray-300" />
+			<span class="text-gray-300">or</span>
+			<hr class="my-5 w-1/3 border-gray-300" />
 		</div>
 		{#if codeSent}
 			<div class="card flex flex-col h-[50%] gap-y-5 justify-center items-center text-center">
@@ -52,7 +42,7 @@
 		{:else}
 			<div class="animate-slideUp card flex flex-col p-10 h-[50%] gap-y-5 justify-center items-center text-center">
 				<h1 class="h1 font-semibold ">Sign in</h1>
-				<form method="post" class="flex flex-col gap-y-2" use:enhance>
+				<form method="post" class="flex w-full flex-col gap-y-2" use:enhance>
 					<label class="label text-lg" for="email">Email</label>
 					<input class="input p-2" name="rectify" id="rectify" type="text"  bind:value={rectify} hidden />
 					<input class="input p-2" name="email" id="email" type="email" on:change={()=> {rectify = null}} bind:value={email} />

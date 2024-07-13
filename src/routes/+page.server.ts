@@ -14,7 +14,6 @@ export const load: PageServerLoad = async (event) => {
 		firstName: event.locals.user.firstName,
 		lastName: event.locals.user.lastName,
 		email: event.locals.user.email,
-		secretVar: event.platform?.env.SMTP_API_KEY
     };
 };
 
