@@ -14,7 +14,6 @@ export const load: PageServerLoad = async (event) => {
 		return redirect(302, "/");
 	}
 	return {
-		key: event.platform?.env.SMTP_API_KEY
 	};
 };
 

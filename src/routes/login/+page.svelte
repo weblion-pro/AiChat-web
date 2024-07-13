@@ -36,7 +36,6 @@
 				</a>
 			</div>
 		</div>
-		<p>{$page.data.key}</p>
 		{#if codeSent}
 			<div class="card flex flex-col h-[50%] gap-y-5 justify-center items-center text-center">
 				<h1 class="h1 font-semibold ">Verify Code</h1>
