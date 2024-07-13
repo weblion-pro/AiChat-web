@@ -13,7 +13,9 @@ export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
 		return redirect(302, "/");
 	}
-	return {};
+	return {
+		key: event.platform?.env.SMTP_API_KEY
+	};
 };
 
 export const actions: Actions = {
@@ -93,7 +95,7 @@ export const actions: Actions = {
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
 		await event.platform?.env.sveltkit_elysia.put(email, code, { expirationTtl: 600 }); // 10 minutes
 		//send email
-		if (dev) {
+		if (!dev) {
 			console.log("code", code);
 			console.log("email not send in dev environement");
 			return {
@@ -103,7 +105,8 @@ export const actions: Actions = {
 		}
 		await sendVerificationEmail(name, email, code, event.platform?.env.SMTP_API_KEY as string);
 		return {
-			codeSent: true
+			codeSent: true,
+
 		}
 		} catch (e) {
 			return fail(500, {
