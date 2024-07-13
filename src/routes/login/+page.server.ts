@@ -60,7 +60,7 @@ export const actions: Actions = {
 			if ( code == await event.platform?.env.sveltkit_elysia.get(email) ) {
 				const existingUser = await db.query.userTable.findFirst({
 					where: eq(schema.userTable.email, email)
-				}) as App.Locals["user"] | null;
+				})
 				const userId = existingUser?.id ?? generateIdFromEntropySize(6);
 				if ( !existingUser ) {
 					// create user

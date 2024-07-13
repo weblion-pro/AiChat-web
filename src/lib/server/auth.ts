@@ -3,13 +3,12 @@ import { DrizzleSQLiteAdapter  } from "@lucia-auth/adapter-drizzle";
 import { drizzle } from "drizzle-orm/d1";
 import { dev } from "$app/environment";
 import * as schema from "../../db/schema";
-import { userInfo } from "os";
-import { USERNAME } from "$env/static/private";
+import { Google } from "arctic";
+import type { ServerLoadEvent } from "@sveltejs/kit";
 
-interface ExtendedUserAttributes {
-    id: string;
-    username: string;
-    firstName: string;
+
+export function initiateGoogleAuthClient(gci:string, gcs:string, url:string) {
+    return new Google(gci, gcs, url);
 }
 
 export function initiateLucia(D1: D1Database) {
@@ -29,6 +28,7 @@ export function initiateLucia(D1: D1Database) {
                 return {
                     // attributes has the type of DatabaseUserAttributes
                     id: attributes.id,
+                    googleId: attributes.googleId,
                     username: attributes.username,
                     firstName: attributes.firstName,
                     lastName: attributes.lastName,
@@ -47,10 +47,11 @@ declare module "lucia" {
 	}
 }
 
-interface DatabaseUserAttributes {
+export interface DatabaseUserAttributes {
     id: string;
 	username: string;
     firstName: string;
     lastName: string;
     email: string;
+    googleId: number;
 }

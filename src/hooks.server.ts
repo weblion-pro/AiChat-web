@@ -1,7 +1,23 @@
 import { initiateLucia } from "$lib/server/auth";
 import type { Handle } from "@sveltejs/kit";
+import { verifyRequestOrigin } from "lucia";
 
 export const handle: Handle = async ({ event, resolve }) => {
+	if (event.request.method !== "GET") {
+		const originHeader = event.request.headers.get("Origin");
+		const hostHeader = event.request.headers.get("Host");
+		if (
+			!originHeader ||
+			!hostHeader ||
+			!verifyRequestOrigin(originHeader, [hostHeader])
+		) {
+			return new Response(null, {
+			status: 403,
+			});
+		}
+	}
+
+
     const lucia = initiateLucia(event.platform?.env.DB as D1Database);
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
