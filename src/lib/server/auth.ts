@@ -53,5 +53,5 @@ export interface DatabaseUserAttributes {
     firstName: string;
     lastName: string;
     email: string;
-    googleId: number;
+    googleId: string;
 }

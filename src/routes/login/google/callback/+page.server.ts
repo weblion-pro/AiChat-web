@@ -1,12 +1,11 @@
-import { fail, redirect, type ServerLoadEvent } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import * as schema from "../../../../db/schema";
-import { OAuth2RequestError } from "arctic";
+import { type RequestEvent, redirect } from "@sveltejs/kit";
 import { generateIdFromEntropySize, Lucia, type User } from "lucia";
 import { initiateLucia, initiateGoogleAuthClient, type DatabaseUserAttributes } from "$lib/server/auth";
 
-import type { PageServerLoad, PageServerLoadEvent, Actions } from "./$types";
+import type {PageServerLoad, PageServerLoadEvent } from "./$types";
 
 interface GoogleUser {
     sub: string,
@@ -20,10 +19,16 @@ interface GoogleUser {
 
 
 export const load: PageServerLoad = async (event) => {
+    console.log("callback load Function called");
 	const state = event.url.searchParams.get("state");
     const code = event.url.searchParams.get("code");
     const storedState = event.cookies.get("google_oauth_state");
     const storedCodeVerifier = event.cookies.get("google_oauth_codeVerifier");
+    if (!storedState || !storedCodeVerifier) {
+        return {
+            reload: true
+        }
+    }
     
     const lucia = initiateLucia(event.platform?.env.DB as D1Database);
     const db = drizzle(event.platform?.env.DB as D1Database, {schema});
@@ -69,10 +74,10 @@ export const load: PageServerLoad = async (event) => {
         }
 
         const existingUser = await db.query.userTable.findFirst({
-            where: eq(schema.userTable.googleId, parseInt(user.sub))
+            where: eq(schema.userTable.googleId, user.sub)
         })
         
-        if (existingUser) {
+        if (existingUser?.id) {
             await checkName(db, existingUser as DatabaseUserAttributes, user);
             await createSessionCookie(event, lucia, existingUser.id);
             
@@ -85,9 +90,9 @@ export const load: PageServerLoad = async (event) => {
             where: eq(schema.userTable.email, user.email)
         });
 
-        if (emailUserExists) {
+        if (emailUserExists?.id) {
             await db.update(schema.userTable).set({
-                googleId: parseInt(user.sub),
+                googleId: user.sub,
                 updatedAt: Date.now()
             }).where(eq(schema.userTable.email, user.email));
             await checkName(db, emailUserExists as DatabaseUserAttributes, user);
@@ -97,32 +102,29 @@ export const load: PageServerLoad = async (event) => {
             }
         }
 
-        const username = user.email.split("@")[0] + generateIdFromEntropySize(2);
+        const id = generateIdFromEntropySize(10);
+        const username = user.email.split("@")[0] + generateIdFromEntropySize(2)
+        
         await db.insert(schema.userTable).values({
-            id: generateIdFromEntropySize(10),
+            id: id,
             username: username,
-            googleId: parseInt(user.sub),
+            googleId: user.sub,
             email: user.email,
             firstName: user.given_name,
             lastName: user.family_name,
             createdAt: Date.now(),
             updatedAt: Date.now()
         });
+        await createSessionCookie(event, lucia, id);
         return {
             username: user.given_name?? username
         }
 
 
-
     } catch (e:any) {
         console.error(e);
-        if (e instanceof OAuth2RequestError) {
-            return {
-                error: e.description
-            };
-        }
         return {
-            error: e.message?? "An error occurred"
+            error: e.message?? e.description?? "An error occured"
         }
     }
 }
@@ -137,16 +139,19 @@ async function createSessionCookie( event:PageServerLoadEvent , lucia: Lucia , i
 }
 
 async function checkName( db: DrizzleD1Database<typeof schema>, existingUser: DatabaseUserAttributes ,user: GoogleUser) {
-    if (existingUser.lastName == "" && !existingUser.lastName) {
+    console.log("checkName Function called");
+    console.log(JSON.stringify(existingUser));
+    if (existingUser.lastName == "" || !existingUser.lastName) {
+        console.log("no last name");
         await db.update(schema.userTable).set({
             lastName: user.family_name
         }).where(eq(schema.userTable.id, existingUser.id));
-        return true
     }
-    if (existingUser.firstName == "" && !existingUser.firstName) {
+    if (existingUser.firstName == "" || !existingUser.firstName) {
+        console.log("no first name");
         await db.update(schema.userTable).set({
             firstName: user.given_name
         }).where(eq(schema.userTable.id, existingUser.id));
-        return true
     }
+    return true
 }

@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { redirect, json } from "@sveltejs/kit";
 import { generateState, generateCodeVerifier } from "arctic";
 import { initiateGoogleAuthClient } from "$lib/server/auth";
 import { dev } from "$app/environment";
@@ -6,7 +6,7 @@ import { dev } from "$app/environment";
 import type { RequestEvent } from "@sveltejs/kit";
 
 export async function GET(event: RequestEvent): Promise<Response> {
-    console.log("origin "+event.url.origin+"/login/google/callback")
+    //console.log("origin "+event.url.origin+"/login/google/callback")
     const google = initiateGoogleAuthClient(
         event.platform?.env.GOOGLE_CLIENT_ID as string,
         event.platform?.env.GOOGLE_CLIENT_SECRET as string,
@@ -26,7 +26,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		secure: !dev, 
 		httpOnly: true,
 		maxAge: 60 * 10,
-		sameSite: "strict"
 	});
 
     event.cookies.set("google_oauth_codeVerifier", codeVerifier, {
@@ -34,7 +33,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		secure: !dev,
 		httpOnly: true,
 		maxAge: 60 * 10,
-		sameSite: "strict"
 	});
 
 	redirect(302, url.toString());

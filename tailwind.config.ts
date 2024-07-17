@@ -19,6 +19,9 @@ const config = {
 	],
 	theme: {
 		extend: {
+			colors: {
+				"khoukhi": "#ef233c"
+			},
 			keyframes: {
 			  slide: {
 				"0%": { transform: "translate(-100%)" },

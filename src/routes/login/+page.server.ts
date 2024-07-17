@@ -13,7 +13,8 @@ export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
 		return redirect(302, "/");
 	}
-	return {};
+	return {
+	};
 };
 
 export const actions: Actions = {
@@ -22,15 +23,15 @@ export const actions: Actions = {
         const db = drizzle(event.platform?.env.DB as D1Database, {schema});
 
 		const formData = await event.request.formData();
-		const email = formData.get("email");
+		const email = formData.get("email")?.toString().toLowerCase();
 		const code = formData.get("code");
-		const rectify = formData.get("rectify");
+		const rectify = formData.get("rectify")?? null;
 
-		if (rectify && Date.now()-parseInt(rectify as string) < 600000){
+		if (rectify && Date.now()-parseInt(rectify as string) < 600000 && !code){
 			return {
 				codeSent: true,
 				rectify: rectify
-			}	
+			}
 		}
 
 		if (
@@ -47,17 +48,19 @@ export const actions: Actions = {
 
 		const existingUser = await db.query.userTable.findFirst({
 			where: eq(schema.userTable.email, email)
-		}) as App.Locals["user"] | null;
+		})
 	
 		const name = existingUser?.firstName ?? email.split("@")[0];
 		
 		if (code) {
 			if (typeof code !== "string" || code.length !== 6 || !/^\d{6}$/.test(code)) {
-				return fail(400, {
-					message: "Invalid code"
-				});
+				return {
+					message: "Invalid code",
+					codeSent: true,
+					rectify: rectify
+				}
 			}
-			if ( code == await event.platform?.env.sveltkit_elysia.get(email) ) {
+			if ( code == await event.platform?.env.petboxkv.get(email) ) {
 				const existingUser = await db.query.userTable.findFirst({
 					where: eq(schema.userTable.email, email)
 				})
@@ -82,18 +85,19 @@ export const actions: Actions = {
 				});
 				return redirect(302, "/");				
 			} else {
-				return fail(400, {
-					message: "Invalid code"
-				});
+				return {
+					message: "wrong code",
+					codeSent: true,
+					rectify: rectify
+				}
 			}
 		}
-
 		try {
 		//generate code
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
-		await event.platform?.env.sveltkit_elysia.put(email, code, { expirationTtl: 600 }); // 10 minutes
+		await event.platform?.env.petboxkv.put(email, code, {expirationTtl: 600}); // 10 minutes
 		//send email
-		if (!dev) {
+		if (dev) {
 			console.log("code", code);
 			console.log("email not send in dev environement");
 			return {
@@ -104,12 +108,12 @@ export const actions: Actions = {
 		await sendVerificationEmail(name, email, code, event.platform?.env.SMTP_API_KEY as string);
 		return {
 			codeSent: true,
-
+			rectify: Date.now()
 		}
-		} catch (e) {
-			return fail(500, {
-				message: "Failed to send verification email"
-			});
+		} catch (e:any) {
+			return {
+				message: e.message?? "An error occured"
+			};
 		}
 	}
 };
