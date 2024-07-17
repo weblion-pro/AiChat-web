@@ -19,7 +19,6 @@ interface GoogleUser {
 
 
 export const load: PageServerLoad = async (event) => {
-    console.log("callback load Function called");
 	const state = event.url.searchParams.get("state");
     const code = event.url.searchParams.get("code");
     const storedState = event.cookies.get("google_oauth_state");
@@ -139,16 +138,13 @@ async function createSessionCookie( event:PageServerLoadEvent , lucia: Lucia , i
 }
 
 async function checkName( db: DrizzleD1Database<typeof schema>, existingUser: DatabaseUserAttributes ,user: GoogleUser) {
-    console.log("checkName Function called");
     console.log(JSON.stringify(existingUser));
     if (existingUser.lastName == "" || !existingUser.lastName) {
-        console.log("no last name");
         await db.update(schema.userTable).set({
             lastName: user.family_name
         }).where(eq(schema.userTable.id, existingUser.id));
     }
     if (existingUser.firstName == "" || !existingUser.firstName) {
-        console.log("no first name");
         await db.update(schema.userTable).set({
             firstName: user.given_name
         }).where(eq(schema.userTable.id, existingUser.id));
