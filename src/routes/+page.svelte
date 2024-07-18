@@ -20,7 +20,7 @@
 <main>
 	<div class="flex p-6 justify-between">
 		<h2 class="h2 font-semibold">Hello, <b>{$page.data.firstName ?? $page.data.username ?? "Not Set"}</b></h2>
-		<button type="button" class="btn variant-filled w-1/4" on:click={logout}>
+		<button type="button" class="btn variant-filled w-1/4 md:w-[8em] " on:click={logout}>
 			logout
 		</button>
 	</div>

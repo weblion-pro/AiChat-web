@@ -21,10 +21,10 @@ export const actions = {
 	default: async (event) => {
 		const db = drizzle(event.platform?.env.DB as D1Database, {schema});
 		const formData = await event.request.formData();
-		const email = formData.get("email");
-		const username = formData.get("username");
-		const firstName = formData.get("firstName");
-		const lastName = formData.get("lastName");
+		const email = formData.get("email")||null;
+		const username = formData.get("username")||null;
+		const firstName = formData.get("firstName")||null;
+		const lastName = formData.get("lastName")||null;
 
 		if (
 			typeof email !== "string" ||
@@ -40,7 +40,7 @@ export const actions = {
 
 		if (
 			typeof username !== "string" ||
-			username.length < 3 ||
+			username.length < 2 ||
 			username.length > 30 ||
 			!/^[a-zA-Z0-9._-]+$/.test(username)
 		) {
@@ -51,7 +51,7 @@ export const actions = {
 
 		if (
 			typeof firstName !== "string" ||
-			firstName.length < 3 ||
+			firstName.length < 1 ||
 			firstName.length > 30 ||
 			!/^[a-zA-Z]+$/.test(firstName)
 		) {
@@ -62,7 +62,7 @@ export const actions = {
 
 		if (
 			typeof lastName !== "string" ||
-			lastName.length < 3 ||
+			lastName.length < 1 ||
 			lastName.length > 30
 
 		) {

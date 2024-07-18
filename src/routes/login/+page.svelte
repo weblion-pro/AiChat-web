@@ -22,11 +22,11 @@
 		</div>
 		<div class="flex justify-between items-center">
 			<hr class="my-5 w-1/3 border-gray-300" />
-			<span class="text-gray-300">or</span>
+			<span class="">or</span>
 			<hr class="my-5 w-1/3 border-gray-300" />
 		</div>
 		{#if codeSent}
-			<div class="card flex flex-col gap-y-5 justify-center items-center text-center">
+			<div class="card flex flex-col p-4 gap-y-5 justify-center items-center text-center">
 				<h1 class="h1 font-semibold ">Verify Code</h1>
 				<p class="text-s">for : {email}</p>
 				<form method="post" class="flex flex-col gap-y-2" use:enhance>

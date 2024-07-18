@@ -45,6 +45,7 @@
 		"@elysiajs/swagger": "^1.0.5",
 		"@lucia-auth/adapter-drizzle": "^1.0.7",
 		"@noble/hashes": "^1.4.0",
+		"@tailwindcss/forms": "^0.5.7",
 		"arctic": "^1.9.1",
 		"argon2": "^0.40.3",
 		"bcryptjs": "^2.4.3",
