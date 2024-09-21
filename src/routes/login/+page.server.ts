@@ -60,7 +60,7 @@ export const actions: Actions = {
 					rectify: rectify
 				}
 			}
-			if ( code == await event.platform?.env.petboxkv.get(email) ) {
+			if ( code == await event.platform?.env.aichatkv.get(email) ) {
 				const existingUser = await db.query.userTable.findFirst({
 					where: eq(schema.userTable.email, email)
 				})
@@ -95,7 +95,7 @@ export const actions: Actions = {
 		try {
 		//generate code
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
-		await event.platform?.env.petboxkv.put(email, code, {expirationTtl: 600}); // 10 minutes
+		await event.platform?.env.aichatkv.put(email, code, {expirationTtl: 600}); // 10 minutes
 		//send email
 		if (dev) {
 			console.log("code", code);
