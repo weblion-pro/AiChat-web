@@ -51,6 +51,7 @@
 		"bcryptjs": "^2.4.3",
 		"drizzle-orm": "^0.31.2",
 		"elysia": "^1.0.26",
-		"sib-api-v3-sdk": "^8.5.0"
+		"sib-api-v3-sdk": "^8.5.0",
+		"svelte-markdown": "^0.4.1"
 	}
 }

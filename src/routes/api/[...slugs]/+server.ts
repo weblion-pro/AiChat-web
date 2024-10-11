@@ -96,7 +96,7 @@ app.post( '/generate', async (c: CF) => {
 				eq(schema.conversationsTable.id, conversationId)
 			)
 
-			const output = tbc? {conversationId, response: response.response}: response.response;
+			const output = tbc? {conversationId, response: response.response}: { response : response.response};
 
 			return new Response(JSON.stringify(output), {
 				status: 200,
