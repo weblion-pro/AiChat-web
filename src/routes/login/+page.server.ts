@@ -96,7 +96,7 @@ export const actions: Actions = {
 		//generate code
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
 		await event.platform?.env.aichatkv.put(email, code, {expirationTtl: 600}); // 10 minutes
-		//send email
+		//ignore email in dev environement
 		if (dev) {
 			console.log("code", code);
 			console.log("email not send in dev environement");
@@ -105,6 +105,7 @@ export const actions: Actions = {
 				rectify: Date.now()
 			}
 		}
+		//send email
 		await sendVerificationEmail(name, email, code, event.platform?.env.SMTP_API_KEY as string);
 		return {
 			codeSent: true,

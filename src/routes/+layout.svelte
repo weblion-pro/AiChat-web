@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import '../app.css';
 	import { autoModeWatcher } from '@skeletonlabs/skeleton';
 	import { LightSwitch } from '@skeletonlabs/skeleton';
@@ -27,6 +28,15 @@
 	if ($updated) {
 		showToast();
 	}
+
+	async function logout() {
+		const res = await fetch('/api/logout', { method: 'POST' })
+		if (res.ok) {
+			location.href = '/login';
+		} else {
+			console.error('Logout failed');
+		}
+	}
 </script>
 
 <svelte:head>{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}</svelte:head>
@@ -41,6 +51,14 @@
         <LightSwitch />
     </div>
 </div>
+{#if $page.data.username}
+	<div class="flex w-1/2 flex-row-reverse align-end justify-end">
+		<button type="button" class="btn variant-filled w-1/4 md:w-[8em] fixed top-24 right-24 z-10 " on:click={logout}>
+			logout
+		</button>
+	</div>
+{/if}
+
 
 <Toast />
 

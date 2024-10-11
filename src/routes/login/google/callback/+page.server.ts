@@ -138,7 +138,7 @@ async function createSessionCookie( event:PageServerLoadEvent , lucia: Lucia , i
 }
 
 async function checkName( db: DrizzleD1Database<typeof schema>, existingUser: DatabaseUserAttributes ,user: GoogleUser) {
-    console.log(JSON.stringify(existingUser));
+    //console.log(JSON.stringify(existingUser));
     if (existingUser.lastName == "" || !existingUser.lastName) {
         await db.update(schema.userTable).set({
             lastName: user.family_name

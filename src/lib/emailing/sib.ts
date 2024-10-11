@@ -11,8 +11,12 @@ export async function sendVerificationEmail(name:string, email:string, code:stri
         },
         body: JSON.stringify({
             "sender": {
-                "email": "no-reply@attendora.com",
-                "name": "Petbox"
+                "email": "no-reply@weblion.pro",
+                "name": "Weblion"
+            },
+            "replyTo":{
+                "email": "questions@weblion.pro",
+                "name": "Weblion"
             },
             "to": [
                 {
@@ -20,8 +24,8 @@ export async function sendVerificationEmail(name:string, email:string, code:stri
                     "name": name
                 }
             ],
-            "subject": "Petbox Verification Code",
-            "htmlContent": `<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Code</title><style>body{font-family:Arial,sans-serif;font-size:16px;background-color:#f4f4f4;margin:0;padding:0}.email-container{max-width:600px;margin:40px auto;background:#fff;border:1px solid #ddd}.email-header{background-color:#007bff;color:#fff;padding:20px;text-align:center}.email-body{padding:20px;text-align:center}.code{font-size:24px;color:#007bff;margin:20px 0;padding:10px;border:1px dashed #007bff;display:inline-block}.footer{text-align:center;color:#777;font-size:14px;padding:20px}</style></head><body><div class="email-container"><div class="email-header"><h1>Verification code</h1></div><div class="email-body"><p>Hello,${name}</p><p>Thank you for choosing petbox! Here is your verification code:</p><div class="code">${code}</div><p>Use this code at signup to verify your email</p><p>If you have any questions, feel free to contact us.</p><a href="mailto:questions@attendora.com" style="color:#007bff">questions@attendora.com</a></div><div class="footer">&copy; ${year} petbox. All rights reserved.</div></div></body></html>`
+            "subject": "Weblion Chat Verification Code",
+            "htmlContent": `<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verify Your Email - WebLion Chat</title></head><body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#e8e8e8"><table role="presentation" style="width:100%;border-collapse:collapse"><tr><td align="center" style="padding:0"><table role="presentation" style="width:600px;border-collapse:collapse;text-align:center;background-color:#fff"><tr><td style="padding:40px 0;background:linear-gradient(135deg,#335c4c 0,#4a8372 100%)"><h1 style="color:#e8e8e8;font-size:28px;margin:0">WebLion Chat</h1></td></tr><tr><td style="padding:40px 30px"><h2 style="color:#181818;font-size:24px;margin-bottom:20px">Verify Your Email</h2><p style="color:#181818;font-size:16px;line-height:1.5;margin-bottom:30px">Thank you for choosing WebLion AI Chat. To complete your login and start chatting, please use the confirmation code below:</p><div style="background-color:#e8e8e8;padding:20px;border-radius:5px;margin-bottom:30px"><h3 style="color:#181818;font-size:20px;margin:0 0 10px 0">Your Confirmation Code:</h3><p style="color:#335c4c;font-size:32px;font-weight:700;letter-spacing:5px;margin:0">${code}</p></div><p style="color:#181818;font-size:16px;line-height:1.5;margin-bottom:20px">To verify your email address Go back to the login page and enter the code above</p><p style="color:#181818;font-size:14px;margin-top:30px">If you didn't request this verification, please ignore this email.</p></td></tr><tr><td style="padding:30px;background-color:#e8e8e8;border-top:1px solid #335c4c"><p style="color:#181818;font-size:14px;margin-bottom:10px">© 2023 Weblion. All rights reserved.</p><p style="color:#181818;font-size:14px;margin-bottom:10px"><a href="https://weblion.pro" style="color:#335c4c;text-decoration:none">Visit our website</a>|<a href="#" style="color:#335c4c;text-decoration:none">Privacy Policy</a>|<a href="#" style="color:#335c4c;text-decoration:none">Terms of Service</a></p></td></tr></table></td></tr></table></body></html>`
         })
     });
     return response.status === 200;

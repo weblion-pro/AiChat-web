@@ -2,7 +2,6 @@ import { generateIdFromEntropySize } from "lucia";
 import { fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { drizzle } from "drizzle-orm/d1";
-import { eq } from "drizzle-orm";
 import * as schema from "../db/schema";
 
 export const load: PageServerLoad = async (event) => {
@@ -14,74 +13,62 @@ export const load: PageServerLoad = async (event) => {
 		firstName: event.locals.user.firstName,
 		lastName: event.locals.user.lastName,
 		email: event.locals.user.email,
+		conversationsCount: event.locals.user.conversationsCount
     };
 };
 
 export const actions = {
 	default: async (event) => {
-		const db = drizzle(event.platform?.env.DB as D1Database, {schema});
 		const formData = await event.request.formData();
-		const email = formData.get("email")||null;
-		const username = formData.get("username")||null;
-		const firstName = formData.get("firstName")||null;
-		const lastName = formData.get("lastName")||null;
-
+		const prompt = formData.get("prompt")||null;
+		const db = drizzle(event.platform?.env.DB as D1Database, {schema});
+		
 		if (
-			typeof email !== "string" ||
-			email.length < 3 ||
-			email.length > 256 ||
-			email.includes("@") === false ||
-			!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+			typeof prompt !== "string" ||
+			prompt.length < 2
 		) {
 			return fail(400, {
 				message: "Invalid email"
 			});
 		}
 
-		if (
-			typeof username !== "string" ||
-			username.length < 2 ||
-			username.length > 30 ||
-			!/^[a-zA-Z0-9._-]+$/.test(username)
-		) {
-			return fail(400, {
-				message: "Invalid username"
+		const conversationId = generateIdFromEntropySize(6)
+		const conversation = JSON.stringify([{role: "user", content: prompt}]);
+	
+		try {
+			await db.insert(schema.conversationsTable).values({
+				id: conversationId,
+				userId: event.locals.user.id,
+				title: prompt.slice(10),
+				conversation: conversation,
+				createdAt: Date.now(),
+				updatedAt: Date.now()
+			});
+			const body = {
+				prompt: prompt,
+				conversationId: conversationId
+			}
+			await event.platform?.env.aichatkv.put(event.locals.session?.id as string, conversation, { expirationTtl: 60*15} );
+			const response = await event.fetch("./api/generate", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(body)
+			}).then(()=>console.log("done"));
+			if (!response.ok) {
+				return fail(500, {
+					message: "Internal server error"
+				});
+			}
+		} catch (e) {
+			console.error(e);
+			return fail(500, {
+				message: "Internal server error"
 			});
 		}
 
-		if (
-			typeof firstName !== "string" ||
-			firstName.length < 1 ||
-			firstName.length > 30 ||
-			!/^[a-zA-Z]+$/.test(firstName)
-		) {
-			return fail(400, {
-				message: "Invalid first name"
-			});
-		}
-
-		if (
-			typeof lastName !== "string" ||
-			lastName.length < 1 ||
-			lastName.length > 30
-
-		) {
-			return fail(400, {
-				message: "Invalid last name"
-			});
-		}
-
-		await db.update(schema.userTable).set({
-			username,
-			firstName,
-			lastName,
-			email,
-			updatedAt: Date.now()
-		}).where(
-			eq(schema.userTable.id, event.locals.user.id)
-		);
-
-		return redirect(302, "/");
+		return redirect(302, "/chat/"+conversationId);
 
 	}
 };

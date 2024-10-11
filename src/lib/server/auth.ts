@@ -32,7 +32,8 @@ export function initiateLucia(D1: D1Database) {
                     username: attributes.username,
                     firstName: attributes.firstName,
                     lastName: attributes.lastName,
-                    email: attributes.email
+                    email: attributes.email,
+                    conversationsCount: attributes.conversationsCount
                 };
             }
         }
@@ -54,4 +55,5 @@ export interface DatabaseUserAttributes {
     lastName: string;
     email: string;
     googleId: string;
+    conversationsCount: number;
 }

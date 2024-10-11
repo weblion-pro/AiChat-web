@@ -2,13 +2,15 @@
 	import { page } from '$app/stores';
 
 	let prompt = '';
+    let conversationId= $page.url.href.split("chat/")[1].split("/")[0];
 	let loading = false;
-    let conversation = [] as { role : string, content: string}[];
+    let conversation = JSON.parse($page.data.conversation) as { role : string, content: string}[];
 	async function handleSubmit(){
         loading = true;
-        conversation = [{role: "user", content: prompt}];
+        conversation = [...conversation, {role: "user", content: prompt}];
         const body = {
-            prompt
+            prompt, 
+            conversationId
         }
         prompt = ""
 		try {
@@ -23,8 +25,9 @@
 
 
         if (response.ok) {
-            const data = await response.json() as {conversationId: string, response: string};
-			location.replace("/chat/"+data.conversationId);
+            const data = await response.text();
+            conversation = [...conversation, {role:"assistant",content: data}]
+            loading = false;
         } else {
             console.error("Failed to send message");
             loading = false;
@@ -51,7 +54,7 @@
             {#if (conversation.length>0)}
                 {#each conversation as message}
                     <div class="flex flex-row gap-5 justify-center">
-                        <div class="flex flex-col w-[78%] justify-center">
+                        <div class="flex flex-col w-[78%] justify-center -z-10">
                             {#if (message.role === "user")}
                                 <div class="flex flex-row items-center gap-3 justify-end">
                                     <p class="p">{message.content}</p>
