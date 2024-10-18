@@ -56,6 +56,7 @@ export const actions = {
 				},
 				body: JSON.stringify(body)
 			}).then(()=>console.log("done"));
+			//@ts-ignore
 			if (!response.ok) {
 				return fail(500, {
 					message: "Internal server error"

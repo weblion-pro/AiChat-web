@@ -7,7 +7,6 @@ import * as schema from "../../../db/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from '@sveltejs/kit';
 import { generateIdFromEntropySize } from 'lucia';
-import { output } from '@noble/hashes/_assert';
 
 interface CF extends Context {
 	platform: App.Platform;
@@ -20,6 +19,9 @@ interface CF extends Context {
 
 interface AiResponse {
 	response: string;
+}
+interface AiImageResponse {
+	image: string;
 }
 
 const app = new Elysia({ aot: false, prefix: '/api' }).use(swagger());
@@ -40,7 +42,6 @@ app.post('/logout', async (c: CF) => {
 });
 
 app.post( '/generate', async (c: CF) => {
-		console.log("here")
 		if (!c.locals.user) {
 			return new Response(null, {
 				status: 401
@@ -112,6 +113,36 @@ app.post( '/generate', async (c: CF) => {
 		}
 	}
 );
+
+app.post("/generateImage", async (c: CF) => {
+	if (!c.locals.user) {
+		return new Response("Not An Authenticated user", {
+			status: 403
+		});
+	}
+	const prompt = c.body.prompt
+	try {
+		//@ts-ignore
+		const response = await c.platform.env.AI.run("@cf/black-forest-labs/flux-1-schnell", {
+			prompt: prompt,
+		}) as AiImageResponse;
+
+		return new Response(response.image, {
+			status: 200,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+	}
+	catch (e) {
+		console.error(e);
+		return new Response(null, {
+			status: 500
+		});
+	}
+});
+
+
 
 type RequestHandler = (v: {
 	request: Request;
